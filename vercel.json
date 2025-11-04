@@ -1,5 +1,6 @@
 {
   "routes": [
+    { "src": "/(.*)%3F.*", "dest": "/$1" },
     { "handle": "filesystem" },
     { "src": "/(.+)/", "dest": "/$1/index.html" },
     { "src": "/([^\\.]+)$", "dest": "/$1.html" }

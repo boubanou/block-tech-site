@@ -1487,5 +1487,74 @@ var wpcf7_utils_url = "https:\/\/block-tech.co\/wp-content\/plugins\/internation
 var wpcf7_utils_url = "https:\/\/block-tech.co\/wp-content\/plugins\/international-telephone-input-for-contact-form-7\/vendor\/intl-tel-input\/js\/utils.js";
 </script>
 <script src="wp-content/plugins/international-telephone-input-for-contact-form-7/assets/js/script.min.js%3Fver=1.4.0" id="wpcf7-intl-tel-js-js"></script>
-	</body>
+	...
+<!-- ton dernier élément de page ici -->
+
+<script>
+(function () {
+  function normalizeKey(v) {
+    if (!v) return "";
+    try { v = decodeURIComponent(v); } catch (_) {}
+    v = v.replace(/\.html?$/i, "");
+    v = v.replace(/^\/+/, "");
+    return v;
+  }
+
+  function scrollToId(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      return true;
+    }
+    return false;
+  }
+
+  function handleInitialRoute() {
+    const url = new URL(window.location.href);
+    const p = url.searchParams.get("p");
+    if (p && scrollToId(normalizeKey(p))) return;
+    const path = normalizeKey(url.pathname);
+    if (path && path !== "index" && scrollToId(path)) return;
+    if (url.hash && scrollToId(normalizeKey(url.hash.slice(1)))) return;
+  }
+
+  function interceptNavClicks() {
+    document.querySelectorAll('a[href]').forEach(a => {
+      const href = a.getAttribute('href') || "";
+      if (/^(#|\/|index\.html(\?|$)|\?|$)/i.test(href)) {
+        a.addEventListener('click', function(e) {
+          const url = new URL(a.href, location.origin);
+          const p = url.searchParams.get("p");
+          const path = url.pathname;
+          const hash = url.hash;
+          const targetId = normalizeKey(p) || normalizeKey(path) || normalizeKey(hash.replace(/^#/, ''));
+          if (targetId && document.getElementById(targetId)) {
+            e.preventDefault();
+            if (p) {
+              history.pushState(null, "", `?p=${normalizeKey(p)}`);
+            } else if (path && path !== "/") {
+              history.pushState(null, "", path);
+            } else if (hash) {
+              history.pushState(null, "", hash);
+            }
+            scrollToId(targetId);
+          }
+        });
+      }
+    });
+
+    window.addEventListener('popstate', handleInitialRoute);
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    handleInitialRoute();
+    interceptNavClicks();
+  });
+})();
+</script>
+
+</body>
+</html>
+
+</body>
 </html>

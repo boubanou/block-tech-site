@@ -1,0 +1,25 @@
+name: Unzip wp-content
+
+on:
+  workflow_dispatch:   # On peut le lancer manuellement depuis l’onglet "Actions"
+
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install unzip
+        run: sudo apt-get install unzip -y
+
+      - name: Unzip wp-content.zip
+        run: unzip -o wp-content.zip -d ./
+
+      - name: Commit and push unzipped files
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "Unzipped wp-content.zip"
+          git push

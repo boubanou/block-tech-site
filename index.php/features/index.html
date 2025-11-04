@@ -939,5 +939,69 @@ var IvorySearchVars = {"is_analytics_enabled":"1"};
 </script>
 <script src="../../wp-content/plugins/add-search-to-menu/public/js/ivory-search.min.js%3Fver=5.5.11" id="ivory-search-scripts-js"></script>
 <script src="../../wp-content/plugins/header-footer-elementor/inc/js/frontend.js%3Fver=2.4.2" id="hfe-frontend-js-js"></script>
-	</body>
+	<script src="wp-content/uploads/international-telephone-input-for-contact-form-7/assets/js/script.min.js?ver=1.4.0"></script>
+
+<!-- 🟩 Colle ce bloc ici 🟩 -->
+<script>
+(function () {
+  const MAP = {
+    "2075": "features",
+    "2477": "about"
+  };
+
+  function dec(s){ try { return decodeURIComponent(s); } catch (_) { return s; } }
+  function norm(v){ return (v||"").replace(/^\/+/, "").replace(/\.html?$/i,"").trim(); }
+  function scrollToId(id){
+    const el = document.getElementById(id);
+    if (el){ el.scrollIntoView({behavior:"smooth", block:"start"}); return true; }
+    return false;
+  }
+  function targetFromURL(u){
+    let p = u.searchParams.get("p");
+    if (p){
+      p = norm(dec(p));
+      if (/^\d+$/.test(p) && MAP[p]) return MAP[p];
+      return p;
+    }
+    const path = norm(u.pathname);
+    if (path && path !== "index") return path;
+    if (u.hash) return norm(u.hash.slice(1));
+    const m = dec(u.pathname).match(/\?p=([^/]+)$/i);
+    if (m){
+      const key = norm(m[1]);
+      if (/^\d+$/.test(key) && MAP[key]) return MAP[key];
+      return key;
+    }
+    return "";
+  }
+  function go(){
+    const t = targetFromURL(new URL(location.href));
+    if (t) scrollToId(t);
+  }
+  function intercept(){
+    document.querySelectorAll('a[href]').forEach(a=>{
+      a.addEventListener('click', e=>{
+        const raw = a.getAttribute('href')||"";
+        if (/^https?:\/\//i.test(raw) && !raw.startsWith(location.origin)) return;
+        const u = new URL(dec(raw), location.origin);
+        const t = targetFromURL(u);
+        if (t && document.getElementById(t)){
+          e.preventDefault();
+          if (u.searchParams.get("p")) history.pushState(null,"", `?p=${Object.entries(MAP).find(([k,v])=>v===t)?.[0]||t}`);
+          else if (u.hash) history.pushState(null,"", `#${t}`);
+          else if (u.pathname && u.pathname!=="/") history.pushState(null,"", `/${t}`);
+          else history.pushState(null,"", `#${t}`);
+          scrollToId(t);
+        }
+      });
+    });
+    addEventListener('popstate', go);
+  }
+  document.addEventListener('DOMContentLoaded', ()=>{ go(); intercept(); });
+})();
+</script>
+</body>
+</html>
+
+</body>
 </html>

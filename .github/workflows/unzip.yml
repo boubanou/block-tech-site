@@ -18,22 +18,20 @@ jobs:
       - name: Install unzip
         run: sudo apt-get update && sudo apt-get install unzip -y
 
-      # Dézippe wp-content.zip s'il existe
       - name: Unzip wp-content.zip (if present)
         run: |
           if [ -f "wp-content.zip" ]; then
             unzip -o wp-content.zip -d ./
           fi
 
-      # Dézippe wp-includes.zip s'il existe
       - name: Unzip wp-includes.zip (if present)
         run: |
           if [ -f "wp-includes.zip" ]; then
             unzip -o wp-includes.zip -d ./
           fi
 
-      # Normalise les noms bizarres (avec ?ver=) dans wp-content ou wp-includes
-      - name: Normalize filenames that contain '?'
+      # 1) Enlève les ?ver=... dans les NOMS de fichiers (cas "?" brut)
+      - name: Normalize filenames with '?'
         shell: bash
         run: |
           set -e
@@ -49,6 +47,23 @@ jobs:
             fi
           done
 
+      # 2) Enlève les %3Fver=... encodés dans les NOMS de fichiers (cas vu dans ta capture)
+      - name: Normalize filenames with '%3F'
+        shell: bash
+        run: |
+          set -e
+          for root in wp-content wp-includes; do
+            if [ -d "$root" ]; then
+              while IFS= read -r -d '' f; do
+                nf="${f%%%3F*}"
+                if [ "$f" != "$nf" ]; then
+                  mkdir -p "$(dirname "$nf")"
+                  mv "$f" "$nf"
+                fi
+              done < <(find "$root" -type f -name '*%3F*' -print0)
+            fi
+          done
+
       - name: Commit and push unzipped files
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -56,5 +71,5 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add .
-          git commit -m "Unzipped wp-content/wp-includes and normalized filenames" || echo "No changes to commit"
+          git commit -m "Unzipped assets + normalized ?ver and %3Fver filenames" || echo "No changes to commit"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} HEAD:main

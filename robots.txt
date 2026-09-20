@@ -1,10 +1,8 @@
 User-agent: *
-Allow: /
 Disallow: /wp-admin/
-Disallow: /wp-json/
-Disallow: /index.php/
-Disallow: /comments/
-Disallow: /feed/
-Disallow: /wp-content/uploads/wpo/wpo-plugins-tables-list.json
+Allow: /wp-admin/admin-ajax.php
 
-Sitemap: https://block-tech.co/sitemap.xml
+Sitemap: https://block-tech.co/wp-sitemap.xml
+
+User-agent: *
+Disallow: /wp-content/uploads/wpo/wpo-plugins-tables-list.json
